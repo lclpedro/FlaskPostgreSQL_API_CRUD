@@ -20,7 +20,7 @@ def municipios():
 @app.route("/api/municipio/<int:cod_municipio>", methods=['GET'])
 def municipio(cod_municipio):
 	valores=[]
-	listamunicipios = Municipio.query.filter(Municipio.cod_municipio == cod_municipio).all()
+	listamunicipios = Municipio.query.filter(Municipio.cod_municipio == cod_municipio)
 	for und in listamunicipios:
 		municipio = {
 			"cod_municipio": und.cod_municipio,
@@ -28,3 +28,36 @@ def municipio(cod_municipio):
 		}
 		valores.append(municipio)
 	return jsonify(valores)
+
+@app.route("/api/municipio/<int:cod_municipio>", methods=['DELETE'])
+def deletar_municipio(cod_municipio):
+	municipio = Municipio.query.filter(Municipio.cod_municipio == cod_municipio).first()
+	db.session.delete(municipio)
+	db.session.commit()
+
+	msg = "Deletado com sucesso!"
+	return msg
+
+@app.route("/api/municipio", methods=['POST'])
+def inserir_municipio():
+	descricao = request.json.get('descricao')
+
+	municipio = {
+		'descricao':descricao
+	}
+
+	addMunicipio = Municipio(**municipio)
+	db.session.add(addMunicipio)
+	db.session.commit()
+
+	msg = "Inserido com sucesso!"
+	return msg
+
+@app.route("/api/municipio/<int:cod_municipio>", methods=['PUT'])
+def atualizar_municipio(cod_municipio):
+	valores = request.json
+
+	Municipio.query.filter(Municipio.cod_municipio == cod_municipio).update(valores)
+	db.session.commit()
+	msg = "Estado atualizado com sucesso!"	
+	return msg
